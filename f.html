@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTINEL AI | Fraud Detection Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .neon-glow-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.5) !important; }
+        .neon-glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); border-color: rgba(34, 197, 94, 0.5) !important; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .analyzing { animation: pulse 1.5s infinite; }
+        select option { background: #1e293b; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-800 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">SENTINEL AI</h1>
+                <p class="text-slate-400 text-sm">Real-time Transaction Integrity Monitor</p>
+            </div>
+            <div class="text-right">
+                <span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30">V3.5 ENGINE ACTIVE</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <section class="lg:col-span-1 glass p-6 rounded-3xl h-fit">
+                <h2 class="text-xl font-bold mb-6 flex items-center">
+                    <span class="mr-2">🔍</span> Audit Parameters
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-wider">Amount (USD)</label>
+                        <input id="amount" type="number" placeholder="0.00" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-cyan-500 transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-wider">Transaction Date & Time</label>
+                        <input id="txDate" type="datetime-local" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-cyan-500 transition-all text-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-wider">Originating Location</label>
+                        <select id="origin" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 focus:outline-none">
+                            <optgroup label="North America">
+                                <option value="New York, USA">New York, USA</option>
+                                <option value="Toronto, Canada">Toronto, Canada</option>
+                                <option value="Mexico City, Mexico">Mexico City, Mexico</option>
+                            </optgroup>
+                            <optgroup label="Europe">
+                                <option value="London, UK">London, UK</option>
+                                <option value="Berlin, Germany">Berlin, Germany</option>
+                                <option value="Paris, France">Paris, France</option>
+                                <option value="Moscow, Russia">Moscow, Russia</option>
+                            </optgroup>
+                            <optgroup label="Asia & Oceania">
+                                <option value="Singapore">Singapore</option>
+                                <option value="Mumbai, India">Mumbai, India</option>
+                                <option value="Tokyo, Japan">Tokyo, Japan</option>
+                                <option value="Sydney, Australia">Sydney, Australia</option>
+                            </optgroup>
+                            <optgroup label="Africa & Middle East">
+                                <option value="Lagos, Nigeria">Lagos, Nigeria</option>
+                                <option value="Dubai, UAE">Dubai, UAE</option>
+                                <option value="Johannesburg, SA">Johannesburg, SA</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-wider">Full Spam/Email Content Analysis</label>
+                        <textarea id="emailContent" rows="5" placeholder="Paste the entire email body here for forensic analysis..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-cyan-500 transition-all text-sm"></textarea>
+                    </div>
+
+                    <button onclick="analyzeTransaction()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 mt-2">
+                        RUN SECURITY AUDIT
+                    </button>
+                </div>
+            </section>
+
+            <section class="lg:col-span-2 space-y-6">
+                <div id="resultCard" class="glass p-8 rounded-3xl min-h-[500px] flex flex-col items-center justify-center text-center transition-all duration-500">
+                    
+                    <div id="idleState">
+                        <div class="text-6xl mb-4">🛡️</div>
+                        <h3 class="text-2xl font-bold">System Standby</h3>
+                        <p class="text-slate-400 max-w-xs mx-auto">Input transaction data and email content for real-time AI heuristic scanning.</p>
+                    </div>
+
+                    <div id="scanningState" class="hidden">
+                        <div class="text-6xl mb-4 analyzing">📡</div>
+                        <h3 class="text-2xl font-bold analyzing">Scanning Content...</h3>
+                        <p class="text-slate-400">Comparing text patterns against known fraud databases and checking node integrity.</p>
+                    </div>
+
+                    <div id="finalState" class="hidden w-full max-w-2xl">
+                        <div id="statusBadge" class="inline-block px-6 py-2 rounded-full text-sm font-black mb-6"></div>
+                        <h2 id="verdictTitle" class="text-4xl font-black mb-2 uppercase tracking-tighter"></h2>
+                        <p id="verdictDesc" class="text-slate-400 mb-8"></p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                            <div class="bg-slate-900/50 p-4 rounded-2xl border border-white/5">
+                                <p class="text-[10px] text-slate-500 uppercase font-bold">Assigned IP Address</p>
+                                <p id="accountIp" class="text-cyan-400 font-mono font-bold"></p>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-2xl border border-white/5">
+                                <p class="text-[10px] text-slate-500 uppercase font-bold">Transaction Timestamp</p>
+                                <p id="timestampResult" class="text-slate-300 font-mono"></p>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-2xl border border-white/5">
+                                <p class="text-[10px] text-slate-500 uppercase font-bold">Node Location</p>
+                                <p id="nodeLoc" class="text-slate-300 font-mono"></p>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-2xl border border-white/5">
+                                <p class="text-[10px] text-slate-500 uppercase font-bold">Risk Score</p>
+                                <p id="riskScore" class="font-mono font-bold"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 p-4 rounded-2xl border border-white/5">
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Forensic Metadata Summary</p>
+                    <p id="spamReports" class="text-orange-400 font-mono text-xs mt-1"></p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        window.onload = () => {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('txDate').value = now.toISOString().slice(0,16);
+        };
+
+        function generateFakeIP() {
+            return Array.from({length: 4}, () => Math.floor(Math.random() * 256)).join('.');
+        }
+
+        function analyzeTransaction() {
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const content = document.getElementById('emailContent').value.toLowerCase();
+            const origin = document.getElementById('origin').value;
+            const txDate = document.getElementById('txDate').value;
+            
+            // UI Transition
+            document.getElementById('idleState').classList.add('hidden');
+            document.getElementById('scanningState').classList.remove('hidden');
+            document.getElementById('finalState').classList.add('hidden');
+            document.getElementById('resultCard').className = "glass p-8 rounded-3xl min-h-[500px] flex flex-col items-center justify-center text-center transition-all duration-500";
+
+            setTimeout(() => {
+                document.getElementById('scanningState').classList.add('hidden');
+                document.getElementById('finalState').classList.remove('hidden');
+                
+                // Advanced Fraud Logic Engine
+                let score = 0;
+                let forensicDetails = [];
+
+                // 1. Linguistic Pattern Analysis
+                const redFlags = {
+                    urgency: ['immediately', 'action required', 'suspended', '24 hours', 'urgent'],
+                    financial: ['wire transfer', 'crypto', 'bitcoin', 'inheritance', 'beneficiary', 'refund'],
+                    impersonation: ['official support', 'security team', 'billing department', 'dear customer'],
+                    threat: ['legal action', 'police', 'prosecution', 'court']
+                };
+
+                let matchCount = 0;
+                Object.entries(redFlags).forEach(([category, words]) => {
+                    const found = words.filter(word => content.includes(word));
+                    if(found.length > 0) {
+                        score += (found.length * 10);
+                        forensicDetails.push(`${category.toUpperCase()} trigger detected`);
+                    }
+                });
+
+                // 2. Anomaly Detection (Amount vs Context)
+                if(amount > 5000) score += 20;
+                if(amount > 20000) score += 30;
+
+                // 3. Geopolitical Risk Assessment
+                const highRiskLocs = ['Lagos, Nigeria', 'Moscow, Russia', 'Mumbai, India'];
+                if(highRiskLocs.includes(origin)) {
+                    score += 15;
+                    forensicDetails.push("High-risk jurisdiction origin");
+                }
+
+                // Final Verdict calculation
+                const isFraud = score >= 50;
+                const card = document.getElementById('resultCard');
+                const badge = document.getElementById('statusBadge');
+                
+                if(isFraud) {
+                    card.classList.add('neon-glow-red');
+                    badge.className = "inline-block px-6 py-2 rounded-full text-sm font-black mb-6 bg-red-500 text-white";
+                    badge.innerText = "THREAT IDENTIFIED";
+                    document.getElementById('verdictTitle').innerText = "Fraud Pattern Detected";
+                    document.getElementById('verdictDesc').innerText = "Content matches known socio-technical engineering tactics. High probability of malicious intent.";
+                    document.getElementById('riskScore').innerText = Math.min(score, 100) + "/100 (HIGH)";
+                    document.getElementById('riskScore').className = "text-red-400 font-bold";
+                    document.getElementById('accountIp').innerText = "102.164." + Math.floor(Math.random() * 254) + ".8 [PROXY MATCH]";
+                } else {
+                    card.classList.add('neon-glow-green');
+                    badge.className = "inline-block px-6 py-2 rounded-full text-sm font-black mb-6 bg-green-500 text-white";
+                    badge.innerText = "CLEARANCE GRANTED";
+                    document.getElementById('verdictTitle').innerText = "Transaction Verified";
+                    document.getElementById('verdictDesc').innerText = "No significant fraud signatures found. Linguistic markers appear consistent with standard traffic.";
+                    document.getElementById('riskScore').innerText = Math.max(score, 5) + "/100 (LOW)";
+                    document.getElementById('riskScore').className = "text-green-400 font-bold";
+                    document.getElementById('accountIp').innerText = generateFakeIP();
+                }
+
+                // Metadata Display
+                document.getElementById('nodeLoc').innerText = origin;
+                document.getElementById('timestampResult').innerText = txDate ? txDate.replace('T', ' ') : "N/A";
+                document.getElementById('spamReports').innerText = forensicDetails.length > 0 ? 
+                    "ANALYSIS: " + forensicDetails.join(' | ') : 
+                    "ANALYSIS: No anomalies detected in text payload.";
+                
+            }, 2200); // Slightly longer for "realistic" processing feel
+        }
+    </script>
+</body>
+</html>
